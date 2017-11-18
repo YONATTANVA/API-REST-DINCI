@@ -177,15 +177,50 @@ namespace WebApiServicesDinci.Controllers
                    SqlError = ex.Message;
                }
                SqlDesconexion();
-           }
-
-           //if (lstRetorno.Count==0)
-           //{
-           //    throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.NotFound));
-           //}
+           }       
 
            return lstRetorno;
        }
+
+      [HttpGet]
+      public List<Citizen> GetAllCitizenLogin(string user, string password)
+      {
+          List<Citizen> lstRetorno = new List<Citizen>();
+          Citizen objetolista = new Citizen();
+          
+          if (SqlConexion(false))
+          {
+              AddStore("Usp_Login");
+              AddParametro("@nameCitizen", SqlDbType.VarChar, user);
+              AddParametro("@passwordCitizen", SqlDbType.VarChar, password);
+
+              try
+              {
+                  SqlDataReader reader = ComandoSql.ExecuteReader();
+                  if (reader.HasRows)
+                  {
+                      while (reader.Read())
+                      {
+                          objetolista = new Citizen();
+                          objetolista.idCitizen = Convert.ToInt32(reader["id_Citizen"]);
+                          objetolista.nameCitizen = Convert.ToString(reader["name_Citizen"]);
+                          objetolista.passwordCitizen = Convert.ToString(reader["password_Citizen"]);
+                          objetolista.phonenumberCitizen = Convert.ToString(reader["phonenumber_Citizen"]);
+                          objetolista.statusCitizen = Convert.ToString(reader["status_Citizen"]);
+                          lstRetorno.Add(objetolista);          
+                      }
+                      reader.Close();
+                  }
+              }
+              catch (Exception ex)
+              {
+                  SqlError = ex.Message;
+              }
+              SqlDesconexion();
+          }
+          return lstRetorno;
+          
+      }
 
 
        [HttpPost]
